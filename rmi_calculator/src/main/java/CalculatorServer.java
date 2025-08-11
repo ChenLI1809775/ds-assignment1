@@ -2,7 +2,7 @@ import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 
 public class CalculatorServer {
-    public CalculatorServer() {
+    public void run() {
         try {
             // Create the registry on port 1099
             Registry registry = LocateRegistry.createRegistry(1099);
@@ -15,12 +15,12 @@ public class CalculatorServer {
             
             System.out.println("Calculator Server is ready.");
         } catch (Exception e) {
-            System.err.println("Calculator Server exception: " + e.toString());
+            System.err.println("Calculator Server exception: " + e);
             e.printStackTrace();
         }
     }
     
     public static void main(String[] args) {
-        new CalculatorServer();
+        new CalculatorServer().run();
     }
 }

@@ -1,44 +1,33 @@
 import java.rmi.RemoteException;
 import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
-import java.rmi.server.RemoteServer;
 
 public class CalculatorImplementation extends UnicastRemoteObject implements Calculator {
     // Stack to store values
     private static final Map<String, Stack<Integer>> clientStacks = new ConcurrentHashMap<>();
-    //Using ThreadLocal to store the client ID
-    private static final ThreadLocal<String> clientIdHolder = new ThreadLocal<>();
 
     public CalculatorImplementation() throws RemoteException {
         super();
     }
 
-    public static void setClientId(String clientId) {
-        clientIdHolder.set(clientId);
-    }
-
-    /**
-     * Clear the client ID
-     */
-    public static void clearClientId() {
-        clientIdHolder.remove();
-    }
     /**
      * Get the current stack for the client
      *
      * @return the current stack for the client
      */
     private Stack<Integer> getCurrentStack() {
-        String clientId = clientIdHolder.get();
-        if (clientId == null) {
-            throw new IllegalStateException("Client ID not set");
+        try {
+            String clientHost = getClientHost();
+            String clientId = clientHost + ":" + Thread.currentThread().getId();
+            return clientStacks.computeIfAbsent(clientId, k -> new Stack<>());
+        } catch (ServerNotActiveException e) {
+            throw new RuntimeException(e);
         }
-        return clientStacks.computeIfAbsent(clientId, k -> new Stack<>());
     }
 
     /**
@@ -60,7 +49,7 @@ public class CalculatorImplementation extends UnicastRemoteObject implements Cal
      * @throws RemoteException throws if the client is not registered
      */
     @Override
-    public void pushOperation(String operator) throws RemoteException, ServerNotActiveException {
+    public void pushOperation(String operator) throws RemoteException {
         Stack<Integer> stack = getCurrentStack();
         if (stack.size() < 2) {
             throw new RemoteException("Not enough operands in stack for operation");
@@ -111,7 +100,7 @@ public class CalculatorImplementation extends UnicastRemoteObject implements Cal
      * @throws RemoteException throws if the client is not registered
      */
     @Override
-    public int pop() throws RemoteException, ServerNotActiveException {
+    public int pop() throws RemoteException {
         Stack<Integer> stack = getCurrentStack();
         if (stack.isEmpty()) {
             throw new RemoteException("Stack is empty");

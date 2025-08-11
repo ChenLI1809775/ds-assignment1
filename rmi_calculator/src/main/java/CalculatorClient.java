@@ -5,10 +5,6 @@ import java.util.UUID;
 public class CalculatorClient {
     public void run() {
         try {
-            // Generate a unique client ID
-            String clientId = UUID.randomUUID().toString();
-            // Set the client ID
-            CalculatorImplementation.setClientId(clientId);
             // Get the registry
             Registry registry = LocateRegistry.getRegistry("localhost");
             
@@ -64,8 +60,6 @@ public class CalculatorClient {
             }
             
             System.out.println("Client test completed.");
-            //Clear the client ID
-            CalculatorImplementation.clearClientId();
         } catch (Exception e) {
             System.err.println("Calculator Client exception: " + e);
             e.printStackTrace();
