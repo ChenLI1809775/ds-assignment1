@@ -1,5 +1,4 @@
 import java.rmi.RemoteException;
-import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +8,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class CalculatorImplementation extends UnicastRemoteObject implements Calculator {
     // Stack to store values
-    private static final Map<String, Stack<Integer>> clientStacks = new ConcurrentHashMap<>();
+    private  final Map<String, Stack<Integer>> clientStacks = new ConcurrentHashMap<>();
+    private  final ThreadLocal<String> clientIdHolder =
+            ThreadLocal.withInitial(() -> {
+                // Generate a unique client ID
+                return "client-" + Thread.currentThread().getId();
+            });
 
     public CalculatorImplementation() throws RemoteException {
         super();
@@ -22,10 +26,10 @@ public class CalculatorImplementation extends UnicastRemoteObject implements Cal
      */
     private Stack<Integer> getCurrentStack() {
         try {
-            String clientHost = getClientHost();
-            String clientId = clientHost + ":" + Thread.currentThread().getId();
+            String clientId = clientIdHolder.get();
+            System.out.println("Client ID: " + clientId);
             return clientStacks.computeIfAbsent(clientId, k -> new Stack<>());
-        } catch (ServerNotActiveException e) {
+        } catch (RuntimeException  e) {
             throw new RuntimeException(e);
         }
     }
@@ -128,7 +132,7 @@ public class CalculatorImplementation extends UnicastRemoteObject implements Cal
      * @throws RemoteException throws if the client is not registered
      */
     @Override
-    public int delayPop(int millis) throws RemoteException, ServerNotActiveException {
+    public int delayPop(int millis) throws RemoteException {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
@@ -136,6 +140,17 @@ public class CalculatorImplementation extends UnicastRemoteObject implements Cal
             throw new RemoteException("Delay interrupted", e);
         }
         return pop();
+    }
+
+    /**
+     * Set the client ID
+     *
+     * @param clientId the client ID
+     * @throws RemoteException throws if the client is not registered
+     */
+    @Override
+    public void setClientId(String clientId) throws RemoteException {
+        clientIdHolder.set(clientId);
     }
 
     /**
