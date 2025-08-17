@@ -18,12 +18,12 @@ public class CalculatorClient {
             calculator.pushValue(10,clientID);
             calculator.pushValue(20,clientID);
             calculator.pushValue(30,clientID);
-
             System.out.println("Pushed values 10, 20, 30");
 
             // Test max operation
             calculator.pushOperation("max",clientID);
             System.out.println("After max operation");
+            System.out.println("Max value: " + calculator.pop(clientID));
 
             // Test push more values
             calculator.pushValue(5,clientID);
@@ -33,23 +33,30 @@ public class CalculatorClient {
             // Test min operation
             calculator.pushOperation("min",clientID);
             System.out.println("After min operation");
+            System.out.println("Min value: " + calculator.pop(clientID));
 
             // Test gcd operation
             calculator.pushValue(24,clientID);
             calculator.pushValue(36,clientID);
             calculator.pushOperation("gcd",clientID);
             System.out.println("After pushing 24, 36 and gcd operation");
+            System.out.println("GCD value: " + calculator.pop(clientID));
 
             // Test lcm operation
             calculator.pushValue(4,clientID);
             calculator.pushValue(6,clientID);
             calculator.pushOperation("lcm",clientID);
             System.out.println("After pushing 4, 6 and lcm operation");
+            System.out.println("LCM value: " + calculator.pop(clientID));
 
             // Test delayPop
+            calculator.pushValue(22,clientID);
+            System.out.println("Pushed value 22");
+            int startTime = (int) System.currentTimeMillis();
             System.out.println("Testing delayPop with 2000 milliseconds");
             int result = calculator.delayPop(2000,clientID);
-            System.out.println("delayPop result: " + result);
+            int endTime = (int) System.currentTimeMillis();
+            System.out.println("delayPop result: " + result+" elapsed time(ms): "+(endTime-startTime));
 
             // Check if stack is empty
             System.out.println("Is stack empty? " + calculator.isEmpty(clientID));
