@@ -54,14 +54,24 @@ In a new terminal, run the client:
 ```
 
 The client will perform the following operations:
-1. Push values 10, 20, 30 to the stack
-2. Perform max operation (result: 30)
-3. Push values 5, 15 to the stack
-4. Perform min operation (result: 5)
-5. Push values 24, 36 and perform GCD operation (result: 12)
-6. Push values 4, 6 and perform LCM operation (result: 12)
-7. Test delayPop with 2000ms delay
-8. Check if stack is empty
+```
+Testing Calculator RMI application...
+1. Pushed values 10, 20, 30
+2. After max operation
+   Max value: 30
+3. Pushed values 5, 15
+4. After min operation
+   Min value: 5
+5. After pushing 24, 36 and gcd operation
+   GCD value: 12
+6. After pushing 4, 6 and lcm operation
+   LCM value: 12
+7. Pushed value 22
+8. Testing delayPop with 2000 milliseconds
+   delayPop result: 22 elapsed time(ms): 2002
+9. Is stack empty? true
+10. Client test completed.
+```
 
 ### 4. Run Unit Tests
 

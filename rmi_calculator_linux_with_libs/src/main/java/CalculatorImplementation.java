@@ -67,25 +67,29 @@ public class CalculatorImplementation extends UnicastRemoteObject implements Cal
         int result = values.get(0);
 
         switch (operator) {
-            case "min" -> {
+            case "min" : {
                 for (int i = 1; i < values.size(); i++) {
                     result = Math.min(result, values.get(i));
                 }
+                break;
             }
-            case "max" -> {
+            case "max" : {
                 for (int i = 1; i < values.size(); i++) {
                     result = Math.max(result, values.get(i));
                 }
+                break;
             }
-            case "lcm" -> {
+            case "lcm" : {
                 for (int i = 1; i < values.size(); i++) {
                     result = lcm(result, values.get(i));
                 }
+                break;
             }
-            case "gcd" -> {
+            case "gcd" : {
                 for (int i = 1; i < values.size(); i++) {
                     result = gcd(result, values.get(i));
                 }
+                break;
             }
         }
         stack.push(result);

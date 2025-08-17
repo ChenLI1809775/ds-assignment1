@@ -111,7 +111,6 @@ public class CalculatorTest {
         calculator.pushValue(20, clientId);
         calculator.pushValue(15, clientId);
         calculator.pushOperation("max", clientId);
-
         assertEquals(20, calculator.pop(clientId));
         assertTrue(calculator.isEmpty(clientId));
 
