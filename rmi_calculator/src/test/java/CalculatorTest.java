@@ -2,7 +2,10 @@ import org.junit.jupiter.api.*;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -178,7 +181,6 @@ public class CalculatorTest {
                 {4, 6, 8},     // For lcm operation: expected result 24
                 {12, 18, 24}   // For gcd operation: expected result 6
         };
-        int[] expectedResults = {10, 30, 24, 6};
 
         // Create 4 client tasks, each testing a different operation
         for (int i = 0; i < 4; i++) {
