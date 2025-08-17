@@ -2,10 +2,10 @@ import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 
 public class CalculatorServer {
-    public void run() {
+    public void run(int port) {
         try {
             // Create the registry on port 1099
-            Registry registry = LocateRegistry.createRegistry(1099);
+            Registry registry = LocateRegistry.createRegistry(port);
             
             // Create the calculator implementation
             CalculatorImplementation calculator = new CalculatorImplementation();
@@ -21,6 +21,6 @@ public class CalculatorServer {
     }
     
     public static void main(String[] args) {
-        new CalculatorServer().run();
+        new CalculatorServer().run(1099);
     }
 }

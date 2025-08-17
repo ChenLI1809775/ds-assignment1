@@ -1,4 +1,5 @@
 import java.rmi.RemoteException;
+import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,11 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CalculatorImplementation extends UnicastRemoteObject implements Calculator {
     // Stack to store values
     private  final Map<String, Stack<Integer>> clientStacks = new ConcurrentHashMap<>();
-    private  final ThreadLocal<String> clientIdHolder =
-            ThreadLocal.withInitial(() -> {
-                // Generate a unique client ID
-                return "client-" + Thread.currentThread().getId();
-            });
 
     public CalculatorImplementation() throws RemoteException {
         super();
@@ -24,12 +20,10 @@ public class CalculatorImplementation extends UnicastRemoteObject implements Cal
      *
      * @return the current stack for the client
      */
-    private Stack<Integer> getCurrentStack() {
+    private Stack<Integer> getCurrentStack(String clientID) {
         try {
-            String clientId = clientIdHolder.get();
-            System.out.println("Client ID: " + clientId);
-            return clientStacks.computeIfAbsent(clientId, k -> new Stack<>());
-        } catch (RuntimeException  e) {
+            return clientStacks.computeIfAbsent(clientID, k -> new Stack<>());
+        } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
     }
@@ -41,8 +35,9 @@ public class CalculatorImplementation extends UnicastRemoteObject implements Cal
      * @throws RemoteException throws if the client is not registered
      */
     @Override
-    public void pushValue(int val) throws RemoteException {
-        Stack<Integer> stack = getCurrentStack();
+    public synchronized void pushValue(int val,String clientID) throws RemoteException {
+        //System.out.println("Push: " + clientIdHolder.get()+" "+val);
+        Stack<Integer> stack = getCurrentStack(clientID);
         stack.push(val);
     }
 
@@ -53,8 +48,9 @@ public class CalculatorImplementation extends UnicastRemoteObject implements Cal
      * @throws RemoteException throws if the client is not registered
      */
     @Override
-    public void pushOperation(String operator) throws RemoteException {
-        Stack<Integer> stack = getCurrentStack();
+    public void pushOperation(String operator,String clientID) throws RemoteException {
+        //System.out.println("pushOperation: " + clientIdHolder.get()+" "+operator);
+        Stack<Integer> stack = getCurrentStack(clientID);
         if (stack.size() < 2) {
             throw new RemoteException("Not enough operands in stack for operation");
         }
@@ -93,7 +89,6 @@ public class CalculatorImplementation extends UnicastRemoteObject implements Cal
                 }
             }
         }
-
         stack.push(result);
     }
 
@@ -104,8 +99,9 @@ public class CalculatorImplementation extends UnicastRemoteObject implements Cal
      * @throws RemoteException throws if the client is not registered
      */
     @Override
-    public int pop() throws RemoteException {
-        Stack<Integer> stack = getCurrentStack();
+    public int pop(String clientID) throws RemoteException {
+        //System.out.println("pop: " + clientIdHolder.get());
+        Stack<Integer> stack = getCurrentStack(clientID);
         if (stack.isEmpty()) {
             throw new RemoteException("Stack is empty");
         }
@@ -119,8 +115,9 @@ public class CalculatorImplementation extends UnicastRemoteObject implements Cal
      * @throws RemoteException throws if the client is not registered
      */
     @Override
-    public boolean isEmpty() throws RemoteException {
-        Stack<Integer> stack = getCurrentStack();
+    public boolean isEmpty(String clientID) throws RemoteException {
+        //System.out.println("isEmpty: " + clientIdHolder.get());
+        Stack<Integer> stack = getCurrentStack(clientID);
         return stack.isEmpty();
     }
 
@@ -132,25 +129,14 @@ public class CalculatorImplementation extends UnicastRemoteObject implements Cal
      * @throws RemoteException throws if the client is not registered
      */
     @Override
-    public int delayPop(int millis) throws RemoteException {
+    public int delayPop(int millis,String clientID) throws RemoteException {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RemoteException("Delay interrupted", e);
         }
-        return pop();
-    }
-
-    /**
-     * Set the client ID
-     *
-     * @param clientId the client ID
-     * @throws RemoteException throws if the client is not registered
-     */
-    @Override
-    public void setClientId(String clientId) throws RemoteException {
-        clientIdHolder.set(clientId);
+        return pop(clientID);
     }
 
     /**

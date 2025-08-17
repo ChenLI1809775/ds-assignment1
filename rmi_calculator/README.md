@@ -20,7 +20,7 @@ src/
 │       └── CalculatorServer.java        # Server launcher
 └── test/
     └── java/
-        └── CalculatorTest.java          # Unit tests
+        └── CalculatorTest1.java          # Unit tests
 ```
 
 ## How to Compile, Run and Test
